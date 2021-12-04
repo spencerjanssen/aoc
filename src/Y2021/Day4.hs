@@ -1,36 +1,25 @@
 module Y2021.Day4 where
 
-import Control.Applicative
-import Control.Monad
 import Data.Char (isDigit)
 import Data.FileEmbed (embedFile)
-import Data.IntSet (IntSet)
 import Data.IntSet qualified as IntSet
-import Data.List
-import Data.List.Extra (maximumOn, minimumOn)
-import Data.Maybe (mapMaybe)
-import Data.Text (Text)
-import Data.Text qualified as T
-import Data.Text.Encoding qualified as T
-import Data.Void
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
-import Text.Read (readMaybe)
 
 example :: Text
-example = T.decodeUtf8 $(embedFile "inputs/2021/day4/day4.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day4/day4.example.txt")
 
 parsedExample :: ([Int], [[[Int]]])
-parsedExample = either (error . errorBundlePretty) id $ parse parser "" example
+parsedExample = either (error . toText . errorBundlePretty) id $ parse parser "" example
 
 problem :: Text
-problem = T.decodeUtf8 $(embedFile "inputs/2021/day4/day4.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day4/day4.problem.txt")
 
 parsedProblem :: ([Int], [[[Int]]])
-parsedProblem = either (error . errorBundlePretty) id $ parse parser "" problem
+parsedProblem = either (error . toText . errorBundlePretty) id $ parse parser "" problem
 
 int :: Parsec Void Text Int
-int = maybe (fail "invalid number") pure . (readMaybe . T.unpack) =<< takeWhile1P (Just "digit") isDigit
+int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
 
 -- >>> either (error . errorBundlePretty) id $ parse (moves <* eof) "" "1234,5"
 -- [1234,5]
@@ -64,7 +53,7 @@ parser = do
 -- >>> buildMoves [1, 2, 3]
 -- [(1,fromList [1]),(2,fromList [1,2]),(3,fromList [1,2,3])]
 buildMoves :: [Int] -> [(Int, IntSet)]
-buildMoves = drop 1 . scanl (\(_, s) i -> (i, IntSet.insert i s)) (undefined, mempty)
+buildMoves = drop 1 . scanl (\(_, s) i -> (i, IntSet.insert i s)) (error "this is unreachable", mempty)
 
 isBingo :: IntSet -> [[Int]] -> Bool
 isBingo s b = any (all (`IntSet.member` s)) $ b <> transpose b
@@ -80,16 +69,20 @@ boardWins ms = mapMaybe (\b -> (b,) <$> playBingo bms b)
   where
     bms = buildMoves ms
 
+-- this is in relude 1.0.0.0
+minimumOn1 :: Ord b => (a -> b) -> [a] -> Maybe a
+minimumOn1 f = listToMaybe . sortOn f
+
 -- >>> part1 parsedExample
 -- 4512
 -- >>> part1 parsedProblem
 -- 2745
-part1 :: ([Int], [[[Int]]]) -> Int
-part1 = score . minimumOn (IntSet.size . snd . snd) . uncurry boardWins
+part1 :: ([Int], [[[Int]]]) -> Maybe Int
+part1 = fmap score . minimumOn1 (IntSet.size . snd . snd) . uncurry boardWins
 
 -- >>> part2 parsedExample
 -- 1924
 -- >>> part2 parsedProblem
 -- 6594
-part2 :: ([Int], [[[Int]]]) -> Int
-part2 = score . maximumOn (IntSet.size . snd . snd) . uncurry boardWins
+part2 :: ([Int], [[[Int]]]) -> Maybe Int
+part2 = fmap score . minimumOn1 (IntSet.size . snd . snd) . uncurry boardWins

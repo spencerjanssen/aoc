@@ -1,44 +1,40 @@
 module Y2021.Day2 where
 
-import Control.Applicative (Applicative (liftA2))
 import Control.Monad
 import Data.Char (isDigit)
 import Data.FileEmbed (embedFile)
 import Data.Functor
-import Data.List (mapAccumL)
 import Data.Monoid
-import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Text.Encoding qualified as T
 import Data.Void
-import Text.Megaparsec
+import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
-import Text.Read (readMaybe)
+import Prelude hiding (Down)
 
 example :: Text
-example = T.decodeUtf8 $(embedFile "inputs/2021/day2/day2.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day2/day2.example.txt")
 
 -- >>> parsedExample
 -- [(Forward,5),(Down,5),(Forward,8),(Up,3),(Down,8),(Forward,2)]
 parsedExample :: [(Direction, Int)]
-parsedExample = either (error . errorBundlePretty) id $ parse movements "example" example
+parsedExample = either (error . toText . errorBundlePretty) id $ parse movements "example" example
 
 problem :: Text
-problem = T.decodeUtf8 $(embedFile "inputs/2021/day2/day2.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day2/day2.problem.txt")
 
 parsedProblem :: [(Direction, Int)]
-parsedProblem = either (error . errorBundlePretty) id $ parse movements "problem" problem
+parsedProblem = either (error . toText . errorBundlePretty) id $ parse movements "problem" problem
 
 -- >>> either (Left . errorBundlePretty) Right $ parse (int <* eof) "" "1234"
 -- Right 1234
 int :: Parsec Void Text Int
-int = maybe (fail "invalid number") pure . (readMaybe . T.unpack) =<< takeWhile1P (Just "digit") isDigit
+int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
 
 data Direction = Forward | Down | Up
     deriving (Show)
 
 direction :: Parsec Void Text Direction
-direction = msum [string (T.toLower $ T.pack $ show d) $> d | d <- [Forward, Down, Up]]
+direction = msum [string (T.toLower $ show d) $> d | d <- [Forward, Down, Up]]
 
 -- >>> either (Left . errorBundlePretty) Right $ parse (movement <* eof) "" "down 1234"
 -- Right (Down,1234)
