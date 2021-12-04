@@ -13,7 +13,7 @@ import Data.FileEmbed (embedFile)
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
 import Data.List
-import Data.List.Extra (minimumOn)
+import Data.List.Extra (maximumOn, minimumOn)
 import Data.Maybe (listToMaybe, mapMaybe)
 import Data.Monoid
 import Data.Text (Text)
@@ -79,12 +79,24 @@ isBingo s b = any (all (`IntSet.member` s)) $ b <> transpose b
 playBingo :: [(Int, IntSet)] -> [[Int]] -> Maybe (Int, IntSet)
 playBingo ms b = find ((`isBingo` b) . snd) ms
 
+score :: ([[Int]], (Int, IntSet)) -> Int
+score (b, (w, ws)) = w * sum (filter (not . (`IntSet.member` ws)) $ concat b)
+
+boardWins :: [Int] -> [[[Int]]] -> [([[Int]], (Int, IntSet))]
+boardWins ms = mapMaybe (\b -> (b,) <$> playBingo bms b)
+  where
+    bms = buildMoves ms
+
 -- >>> part1 parsedExample
 -- 4512
 -- >>> part1 parsedProblem
 -- 2745
 part1 :: ([Int], [[[Int]]]) -> Int
-part1 (ms, bs) = score $ minimumOn (IntSet.size . snd . snd) $ mapMaybe (\b -> (b,) <$> playBingo bms b) bs
-  where
-    bms = buildMoves ms
-    score (b, (w, ws)) = w * sum (filter (not . (`IntSet.member` ws)) $ concat b)
+part1 = score . minimumOn (IntSet.size . snd . snd) . uncurry boardWins
+
+-- >>> part2 parsedExample
+-- 1924
+-- >>> part2 parsedProblem
+-- 6594
+part2 :: ([Int], [[[Int]]]) -> Int
+part2 = score . maximumOn (IntSet.size . snd . snd) . uncurry boardWins
