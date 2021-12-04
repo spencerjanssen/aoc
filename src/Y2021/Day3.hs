@@ -1,25 +1,21 @@
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wall #-}
+module Y2021.Day3 where
 
 import Control.Applicative
 import Data.Coerce (coerce)
 import Data.FileEmbed (embedFile)
 import Data.Monoid
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
+import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
 
 example :: Text
-example = T.decodeUtf8 $(embedFile "2021/day3/day3.example.txt")
+example = T.decodeUtf8 $(embedFile "inputs/2021/day3/day3.example.txt")
 
 parsedExample :: [[Int]]
 parsedExample = parse example
 
 problem :: Text
-problem = T.decodeUtf8 $(embedFile "2021/day3/day3.problem.txt")
+problem = T.decodeUtf8 $(embedFile "inputs/2021/day3/day3.problem.txt")
 
 parsedProblem :: [[Int]]
 parsedProblem = parse problem

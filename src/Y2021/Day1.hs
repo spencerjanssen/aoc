@@ -1,20 +1,17 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
+module Y2021.Day1 where
 
 import Control.Applicative (ZipList (ZipList, getZipList))
 import Data.FileEmbed (embedFile)
 import Data.List (tails)
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.IO as TIO
-import System.Environment (getArgs)
+import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
 
 example :: Text
-example = T.decodeUtf8 $(embedFile "2021/day1/day1.example.txt")
+example = T.decodeUtf8 $(embedFile "inputs/2021/day1/day1.example.txt")
 
 problem :: Text
-problem = T.decodeUtf8 $(embedFile "2021/day1/day1.problem.txt")
+problem = T.decodeUtf8 $(embedFile "inputs/2021/day1/day1.problem.txt")
 
 -- >>> part1 example
 -- 7

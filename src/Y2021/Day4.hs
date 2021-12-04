@@ -1,37 +1,30 @@
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TupleSections #-}
-{-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wall #-}
+module Y2021.Day4 where
 
 import Control.Applicative
 import Control.Monad
 import Data.Char (isDigit)
-import Data.Coerce (coerce)
 import Data.FileEmbed (embedFile)
 import Data.IntSet (IntSet)
-import qualified Data.IntSet as IntSet
+import Data.IntSet qualified as IntSet
 import Data.List
 import Data.List.Extra (maximumOn, minimumOn)
-import Data.Maybe (listToMaybe, mapMaybe)
-import Data.Monoid
+import Data.Maybe (mapMaybe)
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
+import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
 import Data.Void
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
 import Text.Read (readMaybe)
 
 example :: Text
-example = T.decodeUtf8 $(embedFile "2021/day4/day4.example.txt")
+example = T.decodeUtf8 $(embedFile "inputs/2021/day4/day4.example.txt")
 
 parsedExample :: ([Int], [[[Int]]])
 parsedExample = either (error . errorBundlePretty) id $ parse parser "" example
 
 problem :: Text
-problem = T.decodeUtf8 $(embedFile "2021/day4/day4.problem.txt")
+problem = T.decodeUtf8 $(embedFile "inputs/2021/day4/day4.problem.txt")
 
 parsedProblem :: ([Int], [[[Int]]])
 parsedProblem = either (error . errorBundlePretty) id $ parse parser "" problem

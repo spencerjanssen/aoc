@@ -1,6 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wall #-}
+module Y2021.Day2 where
 
 import Control.Applicative (Applicative (liftA2))
 import Control.Monad
@@ -10,15 +8,15 @@ import Data.Functor
 import Data.List (mapAccumL)
 import Data.Monoid
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
+import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Read (readMaybe)
 
 example :: Text
-example = T.decodeUtf8 $(embedFile "2021/day2/day2.example.txt")
+example = T.decodeUtf8 $(embedFile "inputs/2021/day2/day2.example.txt")
 
 -- >>> parsedExample
 -- [(Forward,5),(Down,5),(Forward,8),(Up,3),(Down,8),(Forward,2)]
@@ -26,7 +24,7 @@ parsedExample :: [(Direction, Int)]
 parsedExample = either (error . errorBundlePretty) id $ parse movements "example" example
 
 problem :: Text
-problem = T.decodeUtf8 $(embedFile "2021/day2/day2.problem.txt")
+problem = T.decodeUtf8 $(embedFile "inputs/2021/day2/day2.problem.txt")
 
 parsedProblem :: [(Direction, Int)]
 parsedProblem = either (error . errorBundlePretty) id $ parse movements "problem" problem
