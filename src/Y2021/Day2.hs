@@ -1,12 +1,12 @@
 module Y2021.Day2 where
 
 import Control.Monad
-import Data.Char (isDigit)
 import Data.FileEmbed (embedFile)
 import Data.Functor
 import Data.Monoid
 import Data.Text qualified as T
 import Data.Void
+import MegaParsecUtil
 import Test.Tasty.HUnit
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
@@ -18,18 +18,13 @@ example = decodeUtf8 $(embedFile "inputs/2021/day2/day2.example.txt")
 -- >>> parsedExample
 -- [(Forward,5),(Down,5),(Forward,8),(Up,3),(Down,8),(Forward,2)]
 parsedExample :: [(Direction, Int)]
-parsedExample = either (error . toText . errorBundlePretty) id $ parse movements "example" example
+parsedExample = parseThrow movements "example" example
 
 problem :: Text
 problem = decodeUtf8 $(embedFile "inputs/2021/day2/day2.problem.txt")
 
 parsedProblem :: [(Direction, Int)]
-parsedProblem = either (error . toText . errorBundlePretty) id $ parse movements "problem" problem
-
--- >>> either (Left . errorBundlePretty) Right $ parse (int <* eof) "" "1234"
--- Right 1234
-int :: Parsec Void Text Int
-int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
+parsedProblem = parseThrow movements "problem" problem
 
 data Direction = Forward | Down | Up
     deriving (Show)

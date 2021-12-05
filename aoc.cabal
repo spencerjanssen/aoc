@@ -38,18 +38,23 @@ library
   import:          deps, options
   hs-source-dirs:  src
   exposed-modules:
+    MegaParsecUtil
     Y2021.Day1
     Y2021.Day2
     Y2021.Day3
     Y2021.Day4
+    Y2021.Day5
 
 test-suite test
   import:         deps, options
   main-is:        Tests.hs
   type:           exitcode-stdio-1.0
   hs-source-dirs: src
+  ghc-options:    -Werror
   other-modules:
+    MegaParsecUtil
     Y2021.Day1
     Y2021.Day2
     Y2021.Day3
     Y2021.Day4
+    Y2021.Day5

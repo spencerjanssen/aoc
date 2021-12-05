@@ -1,8 +1,8 @@
 module Y2021.Day4 where
 
-import Data.Char (isDigit)
 import Data.FileEmbed (embedFile)
 import Data.IntSet qualified as IntSet
+import MegaParsecUtil
 import Test.Tasty.HUnit
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
@@ -11,23 +11,20 @@ example :: Text
 example = decodeUtf8 $(embedFile "inputs/2021/day4/day4.example.txt")
 
 parsedExample :: ([Int], [[[Int]]])
-parsedExample = either (error . toText . errorBundlePretty) id $ parse parser "" example
+parsedExample = parseThrow parser "" example
 
 problem :: Text
 problem = decodeUtf8 $(embedFile "inputs/2021/day4/day4.problem.txt")
 
 parsedProblem :: ([Int], [[[Int]]])
-parsedProblem = either (error . toText . errorBundlePretty) id $ parse parser "" problem
+parsedProblem = parseThrow parser "" problem
 
-int :: Parsec Void Text Int
-int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
-
--- >>> either (error . errorBundlePretty) id $ parse (moves <* eof) "" "1234,5"
+-- >>> parseThrow (moves <* eof) "" "1234,5"
 -- [1234,5]
 moves :: Parsec Void Text [Int]
 moves = sepBy1 int (string ",")
 
--- >>> either (error . errorBundlePretty) id $ parse (line <* eof) "" " 1 12  5 10"
+-- >>> parseThrow (line <* eof) "" " 1 12  5 10"
 -- [1,12,5,10]
 line :: Parsec Void Text [Int]
 line = do
@@ -36,12 +33,12 @@ line = do
     void eol
     pure l
 
--- >>> either (error . errorBundlePretty) id $ parse (board <* eof) "" " 1 12  5 10\n1 2 3 4\n"
+-- >>> parseThrow (board <* eof) "" " 1 12  5 10\n1 2 3 4\n"
 -- [[1,12,5,10],[1,2,3,4]]
 board :: Parsec Void Text [[Int]]
 board = some line
 
--- >>> either (error . errorBundlePretty) id $ parse parser "" example
+-- >>> parseThrow parser "" example
 -- ([7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1],[[[22,13,17,11,0],[8,2,23,4,24],[21,9,14,16,7],[6,10,3,18,5],[1,12,20,15,19]],[[3,15,0,2,22],[9,18,13,17,5],[19,8,7,25,23],[20,11,10,24,4],[14,21,16,12,6]],[[14,21,17,24,4],[10,16,15,9,19],[18,8,23,26,20],[22,11,13,6,5],[2,0,12,3,7]]])
 parser :: Parsec Void Text ([Int], [[[Int]]])
 parser = do
