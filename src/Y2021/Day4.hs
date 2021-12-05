@@ -73,6 +73,9 @@ boardWins ms = mapMaybe (\b -> (b,) <$> playBingo bms b)
 minimumOn1 :: Ord b => (a -> b) -> [a] -> Maybe a
 minimumOn1 f = listToMaybe . sortOn f
 
+maximumOn1 :: Ord b => (a -> b) -> [a] -> Maybe a
+maximumOn1 f = coerce . listToMaybe . sortOn (Down . f)
+
 -- >>> part1 parsedExample
 -- 4512
 -- >>> part1 parsedProblem
@@ -81,8 +84,8 @@ part1 :: ([Int], [[[Int]]]) -> Maybe Int
 part1 = fmap score . minimumOn1 (IntSet.size . snd . snd) . uncurry boardWins
 
 -- >>> part2 parsedExample
--- 1924
+-- Just 1924
 -- >>> part2 parsedProblem
--- 6594
+-- Just 6594
 part2 :: ([Int], [[[Int]]]) -> Maybe Int
-part2 = fmap score . minimumOn1 (IntSet.size . snd . snd) . uncurry boardWins
+part2 = fmap score . maximumOn1 (IntSet.size . snd . snd) . uncurry boardWins
