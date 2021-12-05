@@ -3,6 +3,7 @@ module Y2021.Day4 where
 import Data.Char (isDigit)
 import Data.FileEmbed (embedFile)
 import Data.IntSet qualified as IntSet
+import Test.Tasty.HUnit
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
 
@@ -89,3 +90,15 @@ part1 = fmap score . minimumOn1 (IntSet.size . snd . snd) . uncurry boardWins
 -- Just 6594
 part2 :: ([Int], [[[Int]]]) -> Maybe Int
 part2 = fmap score . maximumOn1 (IntSet.size . snd . snd) . uncurry boardWins
+
+unit_part1_example :: Assertion
+unit_part1_example = part1 parsedExample @?= Just 4512
+
+unit_part1_problem :: Assertion
+unit_part1_problem = part1 parsedProblem @?= Just 2745
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= Just 1924
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= Just 6594

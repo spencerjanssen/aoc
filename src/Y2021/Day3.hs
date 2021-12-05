@@ -2,6 +2,7 @@ module Y2021.Day3 where
 
 import Data.FileEmbed (embedFile)
 import Data.Text qualified as T
+import Test.Tasty.HUnit
 
 example :: Text
 example = decodeUtf8 $(embedFile "inputs/2021/day3/day3.example.txt")
@@ -91,3 +92,15 @@ part2 p = product $ map bitString [select (<=) t, select co2 t]
         EQ -> False
         GT -> True
         LT -> False
+
+unit_part1_example :: Assertion
+unit_part1_example = part1 parsedExample @?= 198
+
+unit_part1_problem :: Assertion
+unit_part1_problem = part1 parsedProblem @?= 852500
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= 230
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= 1007985

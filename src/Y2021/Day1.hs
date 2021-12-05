@@ -1,6 +1,7 @@
 module Y2021.Day1 where
 
 import Data.FileEmbed (embedFile)
+import Test.Tasty.HUnit
 
 example :: Text
 example = decodeUtf8 $(embedFile "inputs/2021/day1/day1.example.txt")
@@ -29,3 +30,15 @@ increases xs = sum $ zipWith (\x y -> fromEnum $ y > x) xs (drop 1 xs)
 -- ["ABC","BCD","CDE","DEF","EFG","FGH"]
 windows :: Int -> [b] -> [[b]]
 windows n = getZipList . traverse ZipList . take n . tails
+
+unit_part1_example :: Assertion
+unit_part1_example = part1 example @?= 7
+
+unit_part1_problem :: Assertion
+unit_part1_problem = part1 problem @?= 1548
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 example @?= 5
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 problem @?= 1589

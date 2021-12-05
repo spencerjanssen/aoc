@@ -35,6 +35,7 @@
                 fourmolu
                 pkgs.nixpkgs-fmt
                 treefmt.defaultPackage.${system}
+                tasty-discover
               ]
               else [ ]
               );

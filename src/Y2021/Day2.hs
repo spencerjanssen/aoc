@@ -7,6 +7,7 @@ import Data.Functor
 import Data.Monoid
 import Data.Text qualified as T
 import Data.Void
+import Test.Tasty.HUnit
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
 import Prelude hiding (Down)
@@ -72,3 +73,15 @@ aimMove a (x, y) = (a <> y, (x, x * (a <> y)))
 -- 1749524700
 part2 :: [(Direction, Int)] -> Int
 part2 = getSum . uncurry (*) . mconcat . snd . mapAccumL aimMove mempty . map move
+
+unit_part1_example :: Assertion
+unit_part1_example = part1 parsedExample @?= 150
+
+unit_part1_problem :: Assertion
+unit_part1_problem = part1 parsedProblem @?= 1692075
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= 900
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= 1749524700

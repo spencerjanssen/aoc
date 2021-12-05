@@ -4,28 +4,26 @@ version:       0.1.0.0
 author:        Spencer Janssen
 maintainer:    spencerjanssen@gmail.com
 
-library
+common deps
   build-depends:
     , base
     , containers
     , file-embed
     , megaparsec
     , relude
+    , tasty
+    , tasty-discover
+    , tasty-hunit
     , text
 
+  build-tool-depends: tasty-discover:tasty-discover -any
   mixins:
     base hiding (Prelude),
     relude (Relude as Prelude),
     relude
 
-  hs-source-dirs:     src
+common options
   default-language:   Haskell2010
-  exposed-modules:
-    Y2021.Day1
-    Y2021.Day2
-    Y2021.Day3
-    Y2021.Day4
-
   default-extensions:
     ImportQualifiedPost
     NamedFieldPuns
@@ -35,3 +33,23 @@ library
     TypeApplications
 
   ghc-options:        -Wall
+
+library
+  import:          deps, options
+  hs-source-dirs:  src
+  exposed-modules:
+    Y2021.Day1
+    Y2021.Day2
+    Y2021.Day3
+    Y2021.Day4
+
+test-suite test
+  import:         deps, options
+  main-is:        Tests.hs
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: src
+  other-modules:
+    Y2021.Day1
+    Y2021.Day2
+    Y2021.Day3
+    Y2021.Day4
