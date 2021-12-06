@@ -44,15 +44,31 @@ score = getSum . foldMap Sum
 ntimes :: Int -> (a -> a) -> a -> a
 ntimes n f x = iterate f x !! n
 
+solve :: Int -> [Int] -> Int
+solve n = score . ntimes n advanceSchool . school
+
 -- >>> part1 parsedExample
 -- 5934
 -- >>> part1 parsedProblem
 -- 380243
 part1 :: [Int] -> Int
-part1 = score . ntimes 80 advanceSchool . school
+part1 = solve 80
+
+-- >>> part2 parsedExample
+-- 26984457539
+-- >>> part2 parsedProblem
+-- 1708791884591
+part2 :: [Int] -> Int
+part2 = solve 256
 
 unit_part1_example :: Assertion
 unit_part1_example = part1 parsedExample @?= 5934
 
 unit_part1_problem :: Assertion
 unit_part1_problem = part1 parsedProblem @?= 380243
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= 26984457539
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= 1708791884591
