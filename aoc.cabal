@@ -31,6 +31,7 @@ common options
     TemplateHaskell
     TupleSections
     TypeApplications
+    ViewPatterns
 
   ghc-options:        -Wall
 
@@ -45,6 +46,7 @@ library
     Y2021.Day4
     Y2021.Day5
     Y2021.Day6
+    Y2021.Day7
 
 test-suite test
   import:         deps, options
@@ -60,3 +62,4 @@ test-suite test
     Y2021.Day4
     Y2021.Day5
     Y2021.Day6
+    Y2021.Day7
