@@ -26,6 +26,16 @@ newtype Risk = Risk {getRisk :: Int}
 parse :: Text -> [[Int]]
 parse = fromMaybe (error "invalid input") . traverse (traverse (readMaybe . pure) . toString) . lines
 
+advance :: Int -> Int
+advance 9 = 1
+advance i = succ i
+
+tile :: Int -> [[Int]] -> [[Int]]
+tile n = concat . take n . iterate adv1 . topRow
+  where
+    adv1 = map (map advance)
+    topRow = foldr (zipWith (<>)) (repeat []) . take n . iterate adv1
+
 riskMap :: [[Int]] -> Map (Int, Int) Risk
 riskMap rss = fromList [((i, j), Risk r) | (i, rs) <- zip [0 ..] rss, (j, r) <- zip [0 ..] rs]
 
@@ -71,17 +81,33 @@ shortestPath start end g = go mempty (PSQ.singleton start mempty ())
              in go completed' weights'
     go _ _ = Nothing
 
+solve :: [[Int]] -> Maybe Risk
+solve rss = do
+    rs0 <- nonEmpty rss
+    shortestPath (0, 0) (length rss - 1, length rs0 - 1) (risksToGraph rss)
+
 -- >>> part1 parsedExample
 -- Just (Risk {getRisk = 40})
 -- >>> part1 parsedProblem
 -- Just (Risk {getRisk = 388})
 part1 :: [[Int]] -> Maybe Risk
-part1 rss = do
-    rs0 <- nonEmpty rss
-    shortestPath (0, 0) (length rss - 1, length rs0 - 1) (risksToGraph rss)
+part1 = solve
+
+-- >>> part2 parsedExample
+-- Just (Risk {getRisk = 315})
+-- >>> part2 parsedProblem
+-- Just (Risk {getRisk = 2819})
+part2 :: [[Int]] -> Maybe Risk
+part2 = solve . tile 5
 
 unit_part1_example :: Assertion
 unit_part1_example = part1 parsedExample @?= Just (Risk 40)
 
 unit_part1_problem :: Assertion
 unit_part1_problem = part1 parsedProblem @?= Just (Risk 388)
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= Just (Risk 315)
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= Just (Risk 2819)
