@@ -1,17 +1,17 @@
-module Y2021.Day3 where
+module Y2021.Day03 where
 
 import Data.FileEmbed (embedFile)
 import Data.Text qualified as T
 import Test.Tasty.HUnit
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day3/day3.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day03/example.txt")
 
 parsedExample :: [[Int]]
 parsedExample = parse example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day3/day3.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day03/problem.txt")
 
 parsedProblem :: [[Int]]
 parsedProblem = parse problem

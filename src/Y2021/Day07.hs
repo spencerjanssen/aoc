@@ -1,4 +1,4 @@
-module Y2021.Day7 where
+module Y2021.Day07 where
 
 import Data.FileEmbed
 import Data.Text qualified as T
@@ -6,7 +6,7 @@ import Relude.Extra
 import Test.Tasty.HUnit
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day7/day7.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day07/example.txt")
 
 -- >>> parsedExample
 -- [16,1,2,0,4,2,7,1,2,14]
@@ -14,7 +14,7 @@ parsedExample :: [Int]
 parsedExample = parse example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day7/day7.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day07/problem.txt")
 
 parsedProblem :: [Int]
 parsedProblem = parse problem

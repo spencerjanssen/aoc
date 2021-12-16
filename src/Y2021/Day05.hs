@@ -1,4 +1,4 @@
-module Y2021.Day5 where
+module Y2021.Day05 where
 
 import Data.FileEmbed
 import MegaParsecUtil
@@ -9,7 +9,7 @@ import Text.Megaparsec.Char
 import Prelude hiding (some)
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day5/day5.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day05/example.txt")
 
 -- >>> parsedExample
 -- [((0,9),(5,9)),((8,0),(0,8)),((9,4),(3,4)),((2,2),(2,1)),((7,0),(7,4)),((6,4),(2,0)),((0,9),(2,9)),((3,4),(1,4)),((0,0),(8,8)),((5,5),(8,2))]
@@ -17,7 +17,7 @@ parsedExample :: [((Int, Int), (Int, Int))]
 parsedExample = parseThrow segments "example" example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day5/day5.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day05/problem.txt")
 
 parsedProblem :: [((Int, Int), (Int, Int))]
 parsedProblem = parseThrow segments "problem" problem

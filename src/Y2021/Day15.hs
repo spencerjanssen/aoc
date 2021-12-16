@@ -7,13 +7,13 @@ import Relude.Extra.Map
 import Test.Tasty.HUnit
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day15/day15.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day15/example.txt")
 
 parsedExample :: [[Int]]
 parsedExample = parse example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day15/day15.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day15/problem.txt")
 
 parsedProblem :: [[Int]]
 parsedProblem = parse problem

@@ -1,4 +1,4 @@
-module Y2021.Day6 where
+module Y2021.Day06 where
 
 import Data.FileEmbed
 import Data.IntMap qualified as IM
@@ -8,7 +8,7 @@ import Relude.Extra (toPairs)
 import Test.Tasty.HUnit
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day6/day6.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day06/example.txt")
 
 -- >>> parsedExample
 -- [3,4,3,1,2]
@@ -16,7 +16,7 @@ parsedExample :: [Int]
 parsedExample = parse example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day6/day6.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day06/problem.txt")
 
 parsedProblem :: [Int]
 parsedProblem = parse problem

@@ -1,4 +1,4 @@
-module Y2021.Day4 where
+module Y2021.Day04 where
 
 import Data.FileEmbed (embedFile)
 import Data.IntSet qualified as IntSet
@@ -8,13 +8,13 @@ import Text.Megaparsec hiding (some)
 import Text.Megaparsec.Char
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day4/day4.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day04/example.txt")
 
 parsedExample :: ([Int], [[[Int]]])
 parsedExample = parseThrow parser "" example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day4/day4.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day04/problem.txt")
 
 parsedProblem :: ([Int], [[[Int]]])
 parsedProblem = parseThrow parser "" problem

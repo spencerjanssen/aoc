@@ -42,14 +42,14 @@ library
   hs-source-dirs:  src
   exposed-modules:
     MegaParsecUtil
-    Y2021.Day1
+    Y2021.Day01
+    Y2021.Day02
+    Y2021.Day03
+    Y2021.Day04
+    Y2021.Day05
+    Y2021.Day06
+    Y2021.Day07
     Y2021.Day15
-    Y2021.Day2
-    Y2021.Day3
-    Y2021.Day4
-    Y2021.Day5
-    Y2021.Day6
-    Y2021.Day7
 
 test-suite test
   import:         deps, options
@@ -59,11 +59,11 @@ test-suite test
   ghc-options:    -Werror
   other-modules:
     MegaParsecUtil
-    Y2021.Day1
+    Y2021.Day01
+    Y2021.Day02
+    Y2021.Day03
+    Y2021.Day04
+    Y2021.Day05
+    Y2021.Day06
+    Y2021.Day07
     Y2021.Day15
-    Y2021.Day2
-    Y2021.Day3
-    Y2021.Day4
-    Y2021.Day5
-    Y2021.Day6
-    Y2021.Day7

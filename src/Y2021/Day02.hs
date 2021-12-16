@@ -1,4 +1,4 @@
-module Y2021.Day2 where
+module Y2021.Day02 where
 
 import Control.Monad
 import Data.FileEmbed (embedFile)
@@ -13,7 +13,7 @@ import Text.Megaparsec.Char
 import Prelude hiding (Down)
 
 example :: Text
-example = decodeUtf8 $(embedFile "inputs/2021/day2/day2.example.txt")
+example = decodeUtf8 $(embedFile "inputs/2021/day02/example.txt")
 
 -- >>> parsedExample
 -- [(Forward,5),(Down,5),(Forward,8),(Up,3),(Down,8),(Forward,2)]
@@ -21,7 +21,7 @@ parsedExample :: [(Direction, Int)]
 parsedExample = parseThrow movements "example" example
 
 problem :: Text
-problem = decodeUtf8 $(embedFile "inputs/2021/day2/day2.problem.txt")
+problem = decodeUtf8 $(embedFile "inputs/2021/day02/problem.txt")
 
 parsedProblem :: [(Direction, Int)]
 parsedProblem = parseThrow movements "problem" problem
