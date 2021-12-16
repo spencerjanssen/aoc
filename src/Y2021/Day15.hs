@@ -1,8 +1,7 @@
 module Y2021.Day15 where
 
 import Data.FileEmbed
-import Data.Map.Lazy qualified as Map
-import Data.OrdPSQ qualified as PSQ
+import Data.HashPSQ qualified as PSQ
 import Data.Set qualified as Set
 import Relude.Extra.Map
 import Test.Tasty.HUnit
@@ -57,12 +56,12 @@ risksToGraph rs = fromAdjacencyList [(ij, [(ij', w) | ij' <- neighbors ij, w <- 
 type Graph v w = Map v [(v, w)]
 
 fromAdjacencyList :: Ord v => [(v, [(v, w)])] -> Graph v w
-fromAdjacencyList = Map.fromList
+fromAdjacencyList = fromList
 
 adjacent :: Ord v => v -> Graph v w -> [(v, w)]
 adjacent x g = maybe [] toList $ lookup x g
 
-shortestPath :: (Monoid wg, Ord v, Ord wg) => v -> v -> Graph v wg -> Maybe wg
+shortestPath :: (Monoid wg, Ord v, Ord wg, Hashable v) => v -> v -> Graph v wg -> Maybe wg
 shortestPath start end g = go mempty (PSQ.singleton start mempty ())
   where
     decrease w' Nothing = ((), Just (w', ()))
