@@ -40,24 +40,27 @@ riskMap :: [[Int]] -> Map (Int, Int) Risk
 riskMap rss = fromList [((i, j), Risk r) | (i, rs) <- zip [0 ..] rss, (j, r) <- zip [0 ..] rs]
 
 risksToGraph :: [[Int]] -> Graph (Int, Int) Risk
-risksToGraph rs = fromPaths [(ij, ij', w) | ij <- keys rm, ij' <- neighbors ij, w <- maybeToList $ rm Map.!? ij']
+risksToGraph rs = fromAdjacencyList [(ij, [(ij', w) | ij' <- neighbors ij, w <- maybeToList $ rm !? ij']) | ij <- keys rm]
   where
     rm = riskMap rs
-    neighbors (i, j) =
-        [ (i + di, j + dj)
+    dijs =
+        [ (di, dj)
         | di <- [-1 .. 1]
         , dj <- [-1 .. 1]
-        , di /= 0 || dj /= 0
-        , di == 0 || dj == 0
+        , (di == 0) /= (dj == 0)
+        ]
+    neighbors (i, j) =
+        [ (i + di, j + dj)
+        | (di, dj) <- dijs
         ]
 
 type Graph v w = Map v [(v, w)]
 
-fromPaths :: Ord v => [(v, v, w)] -> Graph v w
-fromPaths uvws = Map.fromListWith (<>) [(u, [(v, w)]) | (u, v, w) <- uvws]
+fromAdjacencyList :: Ord v => [(v, [(v, w)])] -> Graph v w
+fromAdjacencyList = Map.fromList
 
 adjacent :: Ord v => v -> Graph v w -> [(v, w)]
-adjacent x g = fromMaybe [] $ lookup x g
+adjacent x g = maybe [] toList $ lookup x g
 
 shortestPath :: (Monoid wg, Ord v, Ord wg) => v -> v -> Graph v wg -> Maybe wg
 shortestPath start end g = go mempty (PSQ.singleton start mempty ())
