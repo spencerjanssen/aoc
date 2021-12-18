@@ -11,5 +11,5 @@ includes = ["*.cabal"]
 
 [formatter.fourmolu]
 command = "fourmolu"
-options = ["-i", "--ghc-opt", "-XImportQualifiedPost", "--ghc-opt", "-XTypeApplications"]
+options = ["-i", "--ghc-opt", "-XImportQualifiedPost", "--ghc-opt", "-XTypeApplications", "--ghc-opt", "-XBangPatterns"]
 includes = ["*.hs"]
