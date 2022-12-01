@@ -17,7 +17,7 @@ common deps
     , tasty-hunit
     , text
 
-  build-tool-depends: tasty-discover:tasty-discover -any
+  build-tool-depends: tasty-discover:tasty-discover
   mixins:
     base hiding (Prelude),
     relude (Relude as Prelude),
@@ -53,6 +53,7 @@ library
     Y2021.Day07
     Y2021.Day15
     Y2021.Day16
+    Y2022.Day01
 
 test-suite test
   import:         deps, options
@@ -71,3 +72,4 @@ test-suite test
     Y2021.Day07
     Y2021.Day15
     Y2021.Day16
+    Y2022.Day01
