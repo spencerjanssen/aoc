@@ -33,8 +33,19 @@ elf = some1 (int <* eol)
 part1 :: NonEmpty (NonEmpty Int) -> Int
 part1 = maximum1 . fmap sum
 
+-- >>> part2 parsedExample
+-- 45000
+part2 :: NonEmpty (NonEmpty Int) -> Int
+part2 = sum . take 3 . sortBy (flip compare) . toList . fmap sum
+
 unit_part1_example :: Assertion
 unit_part1_example = part1 parsedExample @?= 24000
 
 unit_part1_problem :: Assertion
 unit_part1_problem = part1 parsedProblem @?= 68292
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= 45000
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= 203203
