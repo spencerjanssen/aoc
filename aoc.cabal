@@ -30,6 +30,7 @@ common options
     DerivingVia
     GeneralizedNewtypeDeriving
     ImportQualifiedPost
+    LambdaCase
     NamedFieldPuns
     OverloadedStrings
     TemplateHaskell
@@ -54,6 +55,7 @@ library
     Y2021.Day15
     Y2021.Day16
     Y2022.Day01
+    Y2022.Day02
 
 test-suite test
   import:         deps, options
@@ -73,3 +75,4 @@ test-suite test
     Y2021.Day15
     Y2021.Day16
     Y2022.Day01
+    Y2022.Day02
