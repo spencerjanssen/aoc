@@ -12,7 +12,10 @@ puzzle =
     Puzzle
         { year = "2022"
         , day = "09"
-        , parts = [Part part1 13 6314]
+        , parts =
+            [ Part (touched 1) 13 6314
+            , Part (touched 9) 1 2504
+            ]
         , parser = vectors
         }
 
@@ -51,10 +54,10 @@ vec (Pos tx ty) (Pos hx hy) = Vec (hx - tx) (hy - ty)
 move :: Vec -> Pos -> Pos
 move (Vec dx dy) (Pos x y) = Pos (dx + x) (dy + y)
 
-advanceTail :: Pos -> Pos -> Pos
+advanceTail :: Pos -> Pos -> Vec
 advanceTail t h
-    | abs dx > 1 || abs dy > 1 = move (Vec (signum dx) (signum dy)) t
-    | otherwise = t
+    | abs dx > 1 || abs dy > 1 = Vec (signum dx) (signum dy)
+    | otherwise = Vec 0 0
   where
     Vec dx dy = vec t h
 
@@ -65,15 +68,20 @@ directionVec = \case
     L -> Vec 0 (-1)
     R -> Vec 0 1
 
-part1Positions :: [(Direction, Int)] -> [(Pos, Pos)]
-part1Positions ds = scanl' go (Pos 0 0, Pos 0 0) ds'
+positions :: Int -> [(Direction, Int)] -> [NonEmpty Pos]
+positions n ds = scanl' go initialTails ds'
   where
+    initialTails = Pos 0 0 :| replicate n (Pos 0 0)
     ds' = map directionVec $ concatMap (uncurry $ flip replicate) ds
-    go (h, t) d =
+    go (h :| ts) d =
         let h' = move d h
-         in (h', advanceTail t h')
+         in h' :| case ts of
+                (t : ts') -> toList $ go (t :| ts') $ advanceTail t h'
+                [] -> []
 
--- >>> part1 <$> puzzleInput puzzle Example
+-- >>> touched 1 <$> puzzleInput puzzle Example
 -- 13
-part1 :: [(Direction, Int)] -> Int
-part1 = Set.size . fromList . map snd . part1Positions
+-- >>> touched 9 <$> puzzleInput puzzle Example
+-- 1
+touched :: Int -> [(Direction, Int)] -> Int
+touched n = Set.size . fromList . map last . positions n
