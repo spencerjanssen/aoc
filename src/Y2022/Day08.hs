@@ -7,6 +7,7 @@ import Data.FileEmbed (embedFile)
 import Data.Semigroup
 import MegaParsecUtil
 import Test.Tasty.HUnit
+import Test.Tasty.SmallCheck
 import Text.Megaparsec hiding (some)
 import Text.Megaparsec qualified as MP
 import Text.Megaparsec.Char
@@ -28,31 +29,28 @@ parsedExample = parseThrow grid "example" example
 parsedProblem :: [[Int]]
 parsedProblem = parseThrow grid "problem" problem
 
-newtype Rotation = Rotation (forall a. [[a]] -> [[a]])
+data Rotation = Rotation
+    { into :: forall a. [[a]] -> [[a]]
+    , outof :: forall a. [[a]] -> [[a]]
+    }
 
-composeRotation :: Rotation -> Rotation -> Rotation
-composeRotation (Rotation f) (Rotation g) = Rotation (f . g)
+instance Semigroup Rotation where
+    Rotation f fi <> Rotation g gi = Rotation (f . g) (gi . fi)
 
-runRotation :: Rotation -> [[a]] -> [[a]]
-runRotation (Rotation f) = f
+instance Monoid Rotation where
+    mempty = Rotation id id
 
--- >>> map ((`runRotation` [[1, 2, 3], [4, 5, 6]]) . fst) rotations
--- [[[1,2,3],[4,5,6]],[[1,4],[2,5],[3,6]],[[3,2,1],[6,5,4]],[[4,1],[5,2],[6,3]]]
-rotations :: [(Rotation, Rotation)]
-rotations =
-    liftA2
-        (\f g -> (composeRotation f g, composeRotation g f))
-        [Rotation id, Rotation $ map reverse]
-        [Rotation id, Rotation transpose]
+selfInverse :: (forall a. [[a]] -> [[a]]) -> Rotation
+selfInverse f = Rotation f f
+
+rotations :: [Rotation]
+rotations = liftA2 (<>) [mempty, selfInverse $ map reverse] [mempty, selfInverse transpose]
+
+underRotation :: ([[a]] -> [[b]]) -> Rotation -> ([[a]] -> [[b]])
+underRotation f (Rotation r ri) xs = ri $ f $ r xs
 
 gridly :: forall a. Monoid a => ([Int] -> [a]) -> [[Int]] -> Ap ZipList (Ap ZipList a)
-gridly f g =
-    mconcat
-        [ as
-        | (into, outof) <- rotations
-        , let g' = runRotation into g
-        , let as = coerce @_ @(Ap ZipList (Ap ZipList a)) $ runRotation outof $ map f g'
-        ]
+gridly f g = foldMap (\r -> coerce @_ @(Ap ZipList (Ap ZipList a)) $ underRotation (map f) r g) rotations
 
 solve :: (Monoid c, Monoid a) => ([Int] -> [a]) -> (a -> c) -> [[Int]] -> c
 solve f g = foldMap (foldMap g) . gridly f
@@ -93,3 +91,10 @@ unit_part2_example = part2 parsedExample @?= 8
 
 unit_part2_problem :: Assertion
 unit_part2_problem = part2 parsedProblem @?= 535680
+
+scprop_rotations_inverse :: [[Bool]] -> Property IO
+scprop_rotations_inverse xs = ([] `notElem` xs && sameLength) ==> all (\r -> xs == underRotation id r xs) rotations
+  where
+    sameLength = case xs of
+        [] -> True
+        (y : ys) -> all ((length y ==) . length) ys

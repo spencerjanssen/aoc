@@ -15,6 +15,7 @@ common deps
     , tasty
     , tasty-discover
     , tasty-hunit
+    , tasty-smallcheck
     , text
 
   build-tool-depends: tasty-discover:tasty-discover
