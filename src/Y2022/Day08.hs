@@ -1,4 +1,5 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Y2022.Day08 where
 
@@ -44,17 +45,23 @@ rotations =
         [Rotation id, Rotation $ map reverse]
         [Rotation id, Rotation transpose]
 
-gridVisibility :: [[Int]] -> Ap ZipList (Ap ZipList Any)
-gridVisibility g =
+gridly :: forall a. Monoid a => ([Int] -> [a]) -> [[Int]] -> Ap ZipList (Ap ZipList a)
+gridly f g =
     mconcat
         [ as
         | (into, outof) <- rotations
         , let g' = runRotation into g
-        , let as = coerce @_ @(Ap ZipList (Ap ZipList Any)) $ runRotation outof $ map visibility g'
+        , let as = coerce @_ @(Ap ZipList (Ap ZipList a)) $ runRotation outof $ map f g'
         ]
 
+solve :: (Monoid c, Monoid a) => ([Int] -> [a]) -> (a -> c) -> [[Int]] -> c
+solve f g = foldMap (foldMap g) . gridly f
+
 part1 :: [[Int]] -> Int
-part1 = getSum . foldMap (foldMap (\(Any b) -> if b then 1 else 0)) . gridVisibility
+part1 = getSum . solve visibility (\(Any b) -> if b then 1 else 0)
+
+part2 :: [[Int]] -> Max Int
+part2 = solve viewDistances (\(Product p) -> Max p)
 
 -- >>> visibility . head <$> nonEmpty parsedExample
 -- Just [Any {getAny = True},Any {getAny = False},Any {getAny = False},Any {getAny = True},Any {getAny = False}]
@@ -64,8 +71,25 @@ visibility xs = zipWith ((Any .) . (>)) mxs heights
     mxs = map (Just . Max) xs
     heights = scanl (<>) Nothing mxs
 
+viewDistance :: [Int] -> Int -> Int
+viewDistance hs h = case span (h >) hs of
+    (l, r) -> length l + length (take 1 r)
+
+-- >>> viewDistances [2, 5, 5, 1, 2]
+-- [0,1,1,1,2]
+viewDistances :: [Int] -> [Product Int]
+viewDistances xs = coerce $ zipWith viewDistance horizons xs
+  where
+    horizons = scanl (flip (:)) [] xs
+
 unit_part1_example :: Assertion
 unit_part1_example = part1 parsedExample @?= 21
 
 unit_part1_problem :: Assertion
 unit_part1_problem = part1 parsedProblem @?= 1690
+
+unit_part2_example :: Assertion
+unit_part2_example = part2 parsedExample @?= 8
+
+unit_part2_problem :: Assertion
+unit_part2_problem = part2 parsedProblem @?= 535680
