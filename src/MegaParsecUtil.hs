@@ -4,9 +4,10 @@ module MegaParsecUtil (
     parseThrow,
     parseThrowIO,
     parseEither,
+    asciiAlphaChar,
 ) where
 
-import Data.Char (isDigit)
+import Data.Char (isAsciiLower, isAsciiUpper, isDigit)
 import Text.Megaparsec
 import Text.Megaparsec.Char (digitChar)
 
@@ -24,3 +25,6 @@ digit = maybe (fail "invalid digit") pure . (readMaybe . pure) =<< digitChar
 
 int :: Parsec Void Text Int
 int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
+
+asciiAlphaChar :: Parsec Void Text Char
+asciiAlphaChar = satisfy (\c -> isAsciiLower c || isAsciiUpper c) <?> "ASCII alphabetical char"

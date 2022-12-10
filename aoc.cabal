@@ -59,6 +59,7 @@ library
     Y2021.Day16
     Y2022.Day01
     Y2022.Day02
+    Y2022.Day03
     Y2022.Day08
     Y2022.Day09
 
@@ -82,5 +83,6 @@ test-suite test
     Y2021.Day16
     Y2022.Day01
     Y2022.Day02
+    Y2022.Day03
     Y2022.Day08
     Y2022.Day09
