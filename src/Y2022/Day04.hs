@@ -13,7 +13,7 @@ puzzle =
         { year = "2022"
         , day = "04"
         , parser = pairs
-        , parts = [Part part1 2 511]
+        , parts = [Part part1 2 511, Part part2 4 821]
         }
 
 test_ :: TestTree
@@ -33,5 +33,14 @@ interval = Interval <$> int <* "-" <*> int
 subset :: Interval -> Interval -> Bool
 subset (Interval m n) (Interval o p) = m >= o && n <= p
 
+contains :: Int -> Interval -> Bool
+contains x (Interval u0 u1) = x >= u0 && x <= u1
+
+overlaps :: Interval -> Interval -> Bool
+overlaps u@(Interval u0 _) v@(Interval v0 _) = contains u0 v || contains v0 u
+
 part1 :: [(Interval, Interval)] -> Int
 part1 ps = length [(u, v) | (u, v) <- ps, subset u v || subset v u]
+
+part2 :: [(Interval, Interval)] -> Int
+part2 = length . filter (uncurry overlaps)
