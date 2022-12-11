@@ -1,3 +1,5 @@
+{-# LANGUAGE ExistentialQuantification #-}
+
 module AocUtil where
 
 import Data.ByteString qualified as BS
@@ -19,10 +21,12 @@ data Puzzle a = Puzzle
     , parts :: [Part a]
     }
 
-data Part a = Part
-    { solver :: a -> Int
-    , exampleSolution :: Int
-    , problemSolution :: Int
+data Part a = forall b.
+      (Show b, Eq b) =>
+    Part
+    { solver :: a -> b
+    , exampleSolution :: b
+    , problemSolution :: b
     }
 
 puzzleInput :: Puzzle a -> Input -> IO a
