@@ -5,6 +5,7 @@ module MegaParsecUtil (
     parseThrowIO,
     parseEither,
     asciiAlphaChar,
+    signedInt,
 ) where
 
 import Data.Char (isAsciiLower, isAsciiUpper, isDigit)
@@ -22,6 +23,9 @@ parseEither p desc input = first errorBundlePretty $ parse p desc input
 
 digit :: Parsec Void Text Int
 digit = maybe (fail "invalid digit") pure . (readMaybe . pure) =<< digitChar
+
+signedInt :: Parsec Void Text Int
+signedInt = maybe id (const negate) <$> optional (single '-') <*> int
 
 int :: Parsec Void Text Int
 int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
