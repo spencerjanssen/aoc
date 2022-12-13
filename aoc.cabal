@@ -11,6 +11,7 @@ common deps
     , file-embed
     , filepath
     , megaparsec
+    , pretty-simple
     , psqueues
     , relude
     , tasty
@@ -35,6 +36,7 @@ common options
     LambdaCase
     NamedFieldPuns
     OverloadedStrings
+    RecordWildCards
     TemplateHaskell
     TupleSections
     TypeApplications
@@ -64,6 +66,7 @@ library
     Y2022.Day08
     Y2022.Day09
     Y2022.Day10
+    Y2022.Day11
 
 test-suite test
   import:         deps, options
@@ -90,3 +93,4 @@ test-suite test
     Y2022.Day08
     Y2022.Day09
     Y2022.Day10
+    Y2022.Day11
