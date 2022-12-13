@@ -14,7 +14,10 @@ puzzle =
         { year = "2022"
         , day = "11"
         , parser = monkeys
-        , parts = [Part (score . rounds 20) 10605 50172]
+        , parts =
+            [ Part (score . rounds 20 (`div` 3)) 10605 50172
+            , Part part2 2713310158 11614682178
+            ]
         }
 
 test_ :: TestTree
@@ -75,11 +78,11 @@ monkey = do
     op = (" + " $> Add) <|> (" * " $> Mul)
     expr = Expr <$> ident <*> op <*> ident
 
-turn :: Monkey -> (Monkey, [(MonkeyID, Int)])
-turn m@Monkey{..} = (m{items = mempty, inspected = inspected + length items}, item <$> toList items)
+turn :: (Int -> Int) -> Monkey -> (Monkey, [(MonkeyID, Int)])
+turn w m@Monkey{..} = (m{items = mempty, inspected = inspected + length items}, item <$> toList items)
   where
     item x =
-        let x' = div (evalExpr x operation) 3
+        let x' = w $ evalExpr x operation
          in ( if mod x' divisibleBy == 0
                 then trueMonkey
                 else falseMonkey
@@ -89,21 +92,26 @@ turn m@Monkey{..} = (m{items = mempty, inspected = inspected + length items}, it
 toss :: Monkeys -> (MonkeyID, Int) -> Monkeys
 toss ms (mid, x) = Map.adjust (\m -> m{items = items m <> pure x}) mid ms
 
-round :: Monkeys -> Monkeys
-round ms0 = foldl' f ms0 $ Map.keys ms0
+round :: (Int -> Int) -> Monkeys -> Monkeys
+round w ms0 = foldl' f ms0 $ Map.keys ms0
   where
     f ms mid = case Map.lookup mid ms of
         Nothing -> ms
         Just m0 ->
-            let (m', ts) = turn m0
+            let (m', ts) = turn w m0
              in foldl' toss (Map.insert mid m' ms) ts
 
-rounds :: Int -> Monkeys -> Monkeys
-rounds 0 ms = ms
-rounds n !ms = rounds (pred n) $ round ms
+rounds :: Int -> (Int -> Int) -> Monkeys -> Monkeys
+rounds 0 _ ms = ms
+rounds n w !ms = rounds (pred n) w $ round w ms
 
 score :: Monkeys -> Int
 score = product . take 2 . sortBy (flip compare) . map inspected . Map.elems
+
+part2 :: Monkeys -> Int
+part2 ms = score $ rounds 10000 (`mod` cd) ms
+  where
+    cd = product . ordNub . map divisibleBy $ Map.elems ms
 
 evalExpr :: Int -> Expr -> Int
 evalExpr old (Expr x op y) = f (evalVal x) (evalVal y)
