@@ -13,7 +13,7 @@ puzzle =
         { year = "2022"
         , day = "13"
         , parser = pairs
-        , parts = [Part part1 13 6369]
+        , parts = [Part part1 13 6369, Part part2 140 25800]
         }
 
 test_ :: TestTree
@@ -46,3 +46,14 @@ packet = list <|> Int <$> int
 
 part1 :: [(Packet, Packet)] -> Int
 part1 ps = sum [i | (i, (x, y)) <- zip [1 ..] ps, x <= y]
+
+part2 :: [(Packet, Packet)] -> Int
+part2 ps =
+    product
+        [ i
+        | (i, p) <- zip [1 ..] $ sort $ sigPackets <> concat [[x, y] | (x, y) <- ps]
+        , p `elem` sigPackets
+        ]
+  where
+    sig n = List [List [Int n]]
+    sigPackets = [sig 2, sig 6]
