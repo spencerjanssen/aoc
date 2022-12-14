@@ -12,13 +12,19 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Prelude hiding (many, round, some)
 
-puzzle :: Puzzle ((Int, Int), (Int, Int), AdjacencyMap (G.Distance Int) (Int, Int))
+puzzle ::
+    Puzzle
+        ( (Int, Int)
+        , (Int, Int)
+        , [(Int, Int)]
+        , AdjacencyMap (G.Distance Int) (Int, Int)
+        )
 puzzle =
     Puzzle
         { year = "2022"
         , day = "12"
         , parser = topomap
-        , parts = [Part part1 31 394]
+        , parts = [Part part1 31 394, Part part2 29 388]
         }
 
 test_ :: TestTree
@@ -30,7 +36,7 @@ newtype Elevation = Elevation Char
 data POI = S | E
     deriving (Eq, Show)
 
-topomap :: Parsec Void Text ((Int, Int), (Int, Int), AdjacencyMap (G.Distance Int) (Int, Int))
+topomap :: Parsec Void Text ((Int, Int), (Int, Int), [(Int, Int)], AdjacencyMap (G.Distance Int) (Int, Int))
 topomap = do
     ess <- some (some (Right <$> elevation <|> Left <$> poi) <* eol) <* eof
     let lbl = concat $ zipWith (\i es -> zipWith (\j e -> ((i, j), e)) [0 ..] es) [0 ..] ess
@@ -43,6 +49,7 @@ topomap = do
     let poie S = Elevation 'a'
         poie E = Elevation 'z'
         elbl = Map.fromList $ map (second $ either poie id) lbl
+        starts = [p | (p, Elevation 'a') <- Map.toList elbl]
         g =
             G.edges
                 [ (1 :: G.Distance Int, u, v)
@@ -51,7 +58,7 @@ topomap = do
                 , e' <- maybeToList $ Map.lookup v elbl
                 , adjacent e e'
                 ]
-    pure (start, end, g)
+    pure (start, end, starts, g)
 
 elevation :: Parsec Void Text Elevation
 elevation = Elevation <$> satisfy isAsciiLower <?> "Letter a-z"
@@ -67,11 +74,17 @@ surrounding u = [f (d +) u | d <- [1, -1], f <- [first, second]]
 
 -- >>> part1 <$> puzzleInput puzzle Example
 -- 31
-part1 :: (Ord a, G.StarSemiring e, Ord e) => (a, a, AdjacencyMap e a) -> e
-part1 (start, end, g) = fromMaybe mempty $ shortestPath start end g
+part1 :: (Ord a, G.StarSemiring e, Ord e) => (a, a, [a], AdjacencyMap e a) -> e
+part1 (start, end, _starts, g) = fromMaybe mempty $ shortestPath start end g
 
-pathsFrom :: (Ord a, Ord e, G.Semiring e) => a -> G.AdjacencyMap e a -> [(a, e)]
-pathsFrom src g = go (PQ.singleton src G.one ()) Set.empty
+part2 :: (Ord a, G.StarSemiring e, Ord e) => (a, a, [a], AdjacencyMap e a) -> e
+part2 (_start, end, starts, g) =
+    maybe mempty snd $
+        find ((end ==) . fst) $
+            pathsFrom (Set.fromList starts) g
+
+pathsFrom :: (Ord a, Ord e, G.Semiring e) => Set a -> G.AdjacencyMap e a -> [(a, e)]
+pathsFrom srcs g = go (PQ.fromList $ map (,G.one,()) $ toList srcs) Set.empty
   where
     adj = G.adjacencyMap g
     successors u = maybe [] Map.toList $ Map.lookup u adj
@@ -84,4 +97,4 @@ pathsFrom src g = go (PQ.singleton src G.one ()) Set.empty
     go _ _ = []
 
 shortestPath :: (Ord a, Ord e, G.Semiring e) => a -> a -> AdjacencyMap e a -> Maybe e
-shortestPath start end g = fmap snd $ find ((end ==) . fst) $ pathsFrom start g
+shortestPath start end g = fmap snd $ find ((end ==) . fst) $ pathsFrom (Set.singleton start) g
