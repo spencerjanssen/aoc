@@ -6,9 +6,11 @@ module MegaParsecUtil (
     parseEither,
     asciiAlphaChar,
     signedInt,
+    alphaNum,
+    alphaNumDot,
 ) where
 
-import Data.Char (isAsciiLower, isAsciiUpper, isDigit)
+import Data.Char
 import Text.Megaparsec
 import Text.Megaparsec.Char (digitChar)
 
@@ -32,3 +34,9 @@ int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1
 
 asciiAlphaChar :: Parsec Void Text Char
 asciiAlphaChar = satisfy (\c -> isAsciiLower c || isAsciiUpper c) <?> "ASCII alphabetical char"
+
+alphaNum :: Parsec Void Text Text
+alphaNum = takeWhile1P (Just "ascii alpha num") isAlphaNum
+
+alphaNumDot :: Parsec Void Text Text
+alphaNumDot = takeWhile1P (Just "ascii alpha num or .") (liftA2 (||) isAlphaNum ('.' ==))
