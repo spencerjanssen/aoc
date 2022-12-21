@@ -2,6 +2,7 @@ module Y2022.Day05 where
 
 import AocUtil
 import Data.Map.Strict qualified as Map
+import Data.Semigroup
 import Data.Sequence qualified as Seq
 import MegaParsecUtil
 import Test.Tasty (TestTree)
@@ -15,7 +16,10 @@ puzzle =
         { year = "2022"
         , day = "05"
         , parser = session
-        , parts = [Part part1 95437 1611443]
+        , parts =
+            [ Part part1 95437 1611443
+            , Part part2 24933642 2086088
+            ]
         }
 
 test_ :: TestTree
@@ -69,3 +73,11 @@ dirSizes fszs = Map.toList $ Map.fromListWith (+) [(d', sz) | ((d, _f), sz) <- f
 
 part1 :: [Either Command [DirLine]] -> Int
 part1 = sum . map snd . filter ((<= 100000) . snd) . dirSizes . fileSizes
+
+part2 :: [Either Command [DirLine]] -> Min Int
+part2 transcript = foldMap Min $ filter (>= tgt) $ map snd dszs
+  where
+    fszs = fileSizes transcript
+    used = sum $ map snd fszs
+    tgt = 30000000 - (70000000 - used)
+    dszs = dirSizes fszs
