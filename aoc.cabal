@@ -11,6 +11,7 @@ common deps
     , containers
     , file-embed
     , filepath
+    , fingertree
     , megaparsec
     , pretty-simple
     , psqueues
@@ -71,6 +72,7 @@ library
     Y2022.Day11
     Y2022.Day12
     Y2022.Day13
+    Y2022.Day20
 
 test-suite test
   import:         deps, options
@@ -101,3 +103,4 @@ test-suite test
     Y2022.Day11
     Y2022.Day12
     Y2022.Day13
+    Y2022.Day20

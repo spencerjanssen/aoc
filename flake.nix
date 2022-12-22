@@ -35,6 +35,7 @@
                 pkgs.nixpkgs-fmt
                 pkgs.treefmt
                 tasty-discover
+                pkgs.entr
               ]
               else [ ]
               );
