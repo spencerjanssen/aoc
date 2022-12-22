@@ -21,7 +21,10 @@ puzzle =
         { year = "2022"
         , day = "20"
         , parser = mkMixer <$> endBy signedInt eol <* eof
-        , parts = [Part part1 (Right 3) (Right 3346)]
+        , parts =
+            [ Part (solve 1 1) (Right 3) (Right 3346)
+            , Part (solve 10 811589153) (Right 1623178306) (Right 4265712588168)
+            ]
         }
 
 test_ :: TestTree
@@ -32,11 +35,11 @@ test_part1_steps =
     withResource (puzzleInput puzzle Example) (const $ pure ()) $ \gi ->
         let iters :: Int -> Mixer -> Either Text Mixer
             iters 0 m = pure m
-            iters i m = maybe (pure m) (iters (i - 1) =<<) $ iteration m
+            iters i m = iters (i - 1) =<< iteration m
             tc i xs =
                 testCase ("Iter " <> show i) $ do
                     m <- gi
-                    iters i m @?= Right (FT.fromList xs)
+                    fmap (map element . toList) (iters i m) @?= Right xs
             tcI i n = testCase ("Index " <> show i) $ do
                 Right m <- iters i <$> gi
                 getNext m @?= Just n
@@ -58,81 +61,18 @@ test_part1_steps =
                 , tcI 6 5
                 , tcV 6 5 4
                 , tcR 6 5 4 3
-                , tc
-                    1
-                    [ E 2 (Least 1)
-                    , E 1 Missing
-                    , E (negate 3) (Least 2)
-                    , E 3 (Least 3)
-                    , E (negate 2) (Least 4)
-                    , E 0 (Least 5)
-                    , E 4 (Least 6)
-                    ]
-                , tc
-                    2
-                    [ E 1 Missing
-                    , E (negate 3) (Least 2)
-                    , E 2 Missing
-                    , E 3 (Least 3)
-                    , E (negate 2) (Least 4)
-                    , E 0 (Least 5)
-                    , E 4 (Least 6)
-                    ]
-                , tc
-                    3
-                    [ E 1 Missing
-                    , E 2 Missing
-                    , E 3 (Least 3)
-                    , E (negate 2) (Least 4)
-                    , E (negate 3) Missing
-                    , E 0 (Least 5)
-                    , E 4 (Least 6)
-                    ]
-                , tc
-                    4
-                    [ E 1 Missing
-                    , E 2 Missing
-                    , E (negate 2) (Least 4)
-                    , E (negate 3) Missing
-                    , E 0 (Least 5)
-                    , E 3 Missing
-                    , E 4 (Least 6)
-                    ]
-                , tc
-                    5
-                    [ E 1 Missing
-                    , E 2 Missing
-                    , E (negate 3) Missing
-                    , E 0 (Least 5)
-                    , E 3 Missing
-                    , E 4 (Least 6)
-                    , E (negate 2) Missing
-                    ]
-                , tc
-                    6
-                    [ E 1 Missing
-                    , E 2 Missing
-                    , E (negate 3) Missing
-                    , E 0 Missing
-                    , E 3 Missing
-                    , E 4 (Least 6)
-                    , E (negate 2) Missing
-                    ]
-                , tc
-                    7
-                    [ E 1 Missing
-                    , E 2 Missing
-                    , E (negate 3) Missing
-                    , E 4 Missing
-                    , E 0 Missing
-                    , E 3 Missing
-                    , E (negate 2) Missing
-                    ]
+                , tc 1 [2, 1, negate 3, 3, negate 2, 0, 4]
+                , tc 2 [1, negate 3, 2, 3, negate 2, 0, 4]
+                , tc 3 [1, 2, 3, negate 2, negate 3, 0, 4]
+                , tc 4 [1, 2, negate 2, negate 3, 0, 3, 4]
+                , tc 5 [1, 2, negate 3, 0, 3, 4, negate 2]
+                , tc 6 [1, 2, negate 3, 0, 3, 4, negate 2]
+                , tc 7 [1, 2, negate 3, 4, 0, 3, negate 2]
                 ]
 
 type Mixer = FT.FingerTree M E
 
-data Least = Least Int | Missing
+data Least = Least {generation :: Int, position :: Int} | Missing
     deriving (Eq, Ord, Show)
     deriving (Semigroup) via Min Least
 
@@ -164,9 +104,10 @@ type M = (Size, Least)
 instance Measured M E where
     measure E{moveOrder} = (Size 1, moveOrder)
 
-part1 :: Mixer -> Either Text RelPos
-part1 m0 = score =<< go m0
+solve :: Int -> Int -> Mixer -> Either Text RelPos
+solve generations decryptionKey m0 = score =<< go (FT.fmap' decrypt m0)
   where
+    decrypt x@E{element} = x{element = element * coerce decryptionKey}
     score m =
         let pos n = element <$> index (AbsPos $ n `mod` coerce (fst $ measure m)) m
          in do
@@ -174,23 +115,29 @@ part1 m0 = score =<< go m0
                     Just i -> pure i
                     Nothing -> Left "no zero element"
                 fold <$> sequence [pos $ zp + 1000, pos $ zp + 2000, pos $ zp + 3000]
-    go m = maybe (pure m) (go =<<) $ iteration m
+    go m = do
+        m' <- iteration m
+        case snd $ measure m' of
+            Least{generation} | generation >= generations -> pure m'
+            _ -> go m'
 
-iteration :: Mixer -> Maybe (Either Text Mixer)
+iteration :: Mixer -> Either Text Mixer
 iteration m =
-    getNext m <&> \i -> do
-        rp <- element <$> index i m
-        let j = relPos rp i $ pred $ fst $ measure m
-        move i j m
-
+    maybe
+        (pure m)
+        ( \i -> do
+            rp <- element <$> index i m
+            let j = relPos rp i $ pred $ fst $ measure m
+            move i j m
+        )
+        $ getNext m
 mkMixer :: [Int] -> Mixer
-mkMixer = FT.fromList . zipWith (\i n -> E (RelPos n) (Least i)) [0 ..]
+mkMixer = FT.fromList . zipWith (\i n -> E (RelPos n) (Least 0 i)) [0 ..]
 
 getNext :: Mixer -> Maybe AbsPos
 getNext xs = case measure xs of
-    (_, Least x) ->
-        let below Missing = False
-            below (Least y) = y <= x
+    (_, x@(Least{})) ->
+        let below y = y <= x
          in Just $ coerce $ fst $ measure $ fst $ FT.split (below . snd) xs
     _ -> Nothing
 
@@ -203,7 +150,11 @@ relPos (RelPos n) (AbsPos i) (Size sz) = AbsPos $ case (n + i) `mod` sz of
     x -> x
 
 move :: AbsPos -> AbsPos -> Mixer -> Either Text Mixer
-move i j xs = cutOut i xs <&> \(x, xs') -> putIn j (x{moveOrder = Missing}) xs'
+move i j xs = cutOut i xs <&> \(x, xs') -> putIn j (x{moveOrder = nextGen $ moveOrder x}) xs'
+
+nextGen :: Least -> Least
+nextGen (Least{generation, position}) = Least{generation = succ generation, position}
+nextGen Missing = Missing
 
 cutOut :: AbsPos -> Mixer -> Either Text (E, Mixer)
 cutOut i xs = case slice i xs of
