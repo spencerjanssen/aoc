@@ -8,6 +8,7 @@ module MegaParsecUtil (
     signedInt,
     alphaNum,
     alphaNumDot,
+    asciiAlpha,
 ) where
 
 import Data.Char
@@ -31,6 +32,9 @@ signedInt = maybe id (const negate) <$> optional (single '-') <*> int
 
 int :: Parsec Void Text Int
 int = maybe (fail "invalid number") pure . (readMaybe . toString) =<< takeWhile1P (Just "digit") isDigit
+
+asciiAlpha :: Parsec Void Text Text
+asciiAlpha = takeWhile1P (Just "ASCII alphabetical char") (liftA2 (||) isAsciiLower isAsciiUpper)
 
 asciiAlphaChar :: Parsec Void Text Char
 asciiAlphaChar = satisfy (\c -> isAsciiLower c || isAsciiUpper c) <?> "ASCII alphabetical char"
