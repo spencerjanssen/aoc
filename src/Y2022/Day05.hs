@@ -15,7 +15,10 @@ puzzle =
         { year = "2022"
         , day = "05"
         , parser = cratesAndMoves
-        , parts = [Part part1 "CMZ" "WSFTMRHPP"]
+        , parts =
+            [ Part (solve reverse) "CMZ" "WSFTMRHPP"
+            , Part (solve id) "MCD" "GSLCMFBRP"
+            ]
         }
 
 test_ :: TestTree
@@ -65,10 +68,10 @@ move = do
     to <- int
     pure Move{..}
 
-runMove :: IntMap Tower -> Move -> IntMap Tower
-runMove t Move{moves, from, to} = IntMap.insertWith (<>) to (reverse taken) $ IntMap.insert from remain t
+runMove :: (Tower -> Tower) -> IntMap Tower -> Move -> IntMap Tower
+runMove f t Move{moves, from, to} = IntMap.insertWith (<>) to (f taken) $ IntMap.insert from remain t
   where
     (taken, remain) = splitAt moves $ fromMaybe [] $ IntMap.lookup from t
 
-part1 :: (IntMap Tower, [Move]) -> String
-part1 (ts, ms) = mapMaybe listToMaybe $ toList $ foldl' runMove ts ms
+solve :: (Tower -> Tower) -> (IntMap Tower, [Move]) -> String
+solve f (ts, ms) = mapMaybe listToMaybe $ toList $ foldl' (runMove f) ts ms
