@@ -74,6 +74,7 @@ library
     Y2022.Day11
     Y2022.Day12
     Y2022.Day13
+    Y2022.Day14
     Y2022.Day20
     Y2022.Day21
 
@@ -108,5 +109,6 @@ test-suite test
     Y2022.Day11
     Y2022.Day12
     Y2022.Day13
+    Y2022.Day14
     Y2022.Day20
     Y2022.Day21
