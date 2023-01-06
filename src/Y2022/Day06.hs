@@ -14,7 +14,10 @@ puzzle =
         { year = "2022"
         , day = "06"
         , parser = alphaNum <* eol <* eof
-        , parts = [Part part1 (Just 7) (Just 1142)]
+        , parts =
+            [ Part (solve 4) (Just 7) (Just 1142)
+            , Part (solve 14) (Just 19) (Just 2803)
+            ]
         }
 
 test_ :: TestTree
@@ -27,7 +30,7 @@ windows n0 xs0 = map ($ []) $ go n0
     go 1 = xs'
     go n = zipWith (.) (replicate (n - 1) id <> xs') (go $ n - 1)
 
-part1 :: Text -> Maybe Integer
-part1 = fmap fst . find (ok . snd) . zip [1 ..] . windows 4 . toString
+solve :: Int -> Text -> Maybe Integer
+solve n = fmap fst . find (ok . snd) . zip [1 ..] . windows n . toString
   where
-    ok = (4 ==) . Set.size . Set.fromList
+    ok = (n ==) . Set.size . Set.fromList
