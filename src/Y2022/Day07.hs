@@ -1,4 +1,4 @@
-module Y2022.Day05 where
+module Y2022.Day07 where
 
 import AocUtil
 import Data.Map.Strict qualified as Map
@@ -14,7 +14,7 @@ puzzle :: Puzzle [Either Command [DirLine]]
 puzzle =
     Puzzle
         { year = "2022"
-        , day = "05"
+        , day = "07"
         , parser = session
         , parts =
             [ Part part1 95437 1611443
