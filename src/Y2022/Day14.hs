@@ -17,7 +17,10 @@ puzzle =
         { year = "2022"
         , day = "14"
         , parser = endBy path eol <* eof
-        , parts = [Part (simulate . drawPaths) 24 793]
+        , parts =
+            [ Part (part1 . drawPaths) 24 793
+            , Part (part2 . drawPaths) 93 24166
+            ]
         }
 
 test_ :: TestTree
@@ -50,20 +53,36 @@ directions (x, y) = [(x, y + 1), (x - 1, y + 1), (x + 1, y + 1)]
 sandStep :: Grid -> Coord -> Coord
 sandStep g c = fromMaybe c $ find (`Set.notMember` g) $ directions c
 
-sandFinal :: Int -> Grid -> Coord -> Maybe Coord
-sandFinal ymax g = go
+sandFinal :: (Coord -> Bool) -> Grid -> Coord -> Coord
+sandFinal done g = go
   where
-    go c@(_, y)
-        | y > ymax = Nothing
-        | c == c' = Just c
+    go c
+        | done c || c == c' = c
         | otherwise = go c'
       where
         c' = sandStep g c
 
-simulate :: Grid -> Int
-simulate g0 = go 0 g0
+simulate :: (Grid -> Coord -> Bool) -> (Coord -> Bool) -> Grid -> Int
+simulate finished done = go 0
   where
-    ymax = fromMaybe 0 $ viaNonEmpty (maximum1 . fmap snd) $ Set.toList g0
-    go !n g = case sandFinal ymax g (500, 0) of
-        Nothing -> n
-        Just s -> go (succ n) (Set.insert s g)
+    go !n g
+        | finished g s = n
+        | otherwise = go (succ n) (Set.insert s g)
+      where
+        s = sandFinal done g (500, 0)
+
+ymax :: Grid -> Int
+ymax = fromMaybe 0 . viaNonEmpty (maximum1 . fmap snd) . Set.toList
+
+part1 :: Grid -> Int
+part1 g = simulate (const finished) finished g
+  where
+    ym = ymax g
+    finished (_, y) = y > ym
+
+part2 :: Grid -> Int
+part2 g0 = simulate finished done g0
+  where
+    done (_, y) = y == ym + 1
+    finished g _ = Set.member (500, 0) g
+    ym = ymax g0
