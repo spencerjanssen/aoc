@@ -65,6 +65,7 @@ library
     Y2022.Day02
     Y2022.Day03
     Y2022.Day04
+    Y2022.Day05
     Y2022.Day07
     Y2022.Day08
     Y2022.Day09
@@ -97,6 +98,7 @@ test-suite test
     Y2022.Day02
     Y2022.Day03
     Y2022.Day04
+    Y2022.Day05
     Y2022.Day07
     Y2022.Day08
     Y2022.Day09
