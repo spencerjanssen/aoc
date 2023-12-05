@@ -1,5 +1,3 @@
-{-# LANGUAGE BlockArguments #-}
-
 module Y2023.Day01 where
 
 import AocUtil
