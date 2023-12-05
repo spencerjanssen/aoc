@@ -1,3 +1,5 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 module Y2023.Day02 where
 
 import AocUtil
@@ -8,14 +10,15 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Prelude hiding (First (..), Last (..), many, round, some)
 
-puzzle :: Puzzle [(ID, [Cubes])]
+puzzle :: Puzzle [(ID, Game)]
 puzzle =
     Puzzle
         { year = "2023"
         , day = "02"
         , parser = games
         , parts =
-            [ Part solve 8 2593
+            [ Part part1 8 2593
+            , Part part2 2286 54699
             ]
         }
 
@@ -24,21 +27,21 @@ test_ = tests puzzle
 
 type ID = Int
 
-type Game = [Cubes]
+type Game = [Cubes Sum]
 
-data Cubes = Cubes
-    { red :: Int
-    , green :: Int
-    , blue :: Int
+data Cubes f = Cubes
+    { red :: f Int
+    , green :: f Int
+    , blue :: f Int
     }
 
-instance Semigroup Cubes where
-    Cubes r1 g1 b1 <> Cubes r2 g2 b2 = Cubes (r1 + r2) (g1 + g2) (b1 + b2)
+instance Semigroup (f Int) => Semigroup (Cubes f) where
+    Cubes r1 g1 b1 <> Cubes r2 g2 b2 = Cubes (r1 <> r2) (g1 <> g2) (b1 <> b2)
 
-instance Monoid Cubes where
-    mempty = Cubes 0 0 0
+instance Monoid (f Int) => Monoid (Cubes f) where
+    mempty = Cubes mempty mempty mempty
 
-isSubsetOf :: Cubes -> Cubes -> Bool
+isSubsetOf :: Ord (f Int) => Cubes f -> Cubes f -> Bool
 isSubsetOf (Cubes r1 g1 b1) (Cubes r2 g2 b2) = r1 <= r2 && g1 <= g2 && b1 <= b2
 
 games :: Parsec Void Text [(ID, Game)]
@@ -52,23 +55,36 @@ game = do
     cs <- sepBy cubes "; "
     pure (i, cs)
 
-cubes :: Parsec Void Text Cubes
+cubes :: Parsec Void Text (Cubes Sum)
 cubes = fold <$> sepBy cube ", "
 
-cube :: Parsec Void Text Cubes
+cube :: Parsec Void Text (Cubes Sum)
 cube = do
     i <- int
     void " "
     c <- color
-    pure $ c i
+    pure $ c $ Sum i
 
-color :: Parsec Void Text (Int -> Cubes)
+color :: Parsec Void Text (Sum Int -> Cubes Sum)
 color =
     ("red" $> \c -> mempty{red = c})
         <|> ("green" $> \c -> mempty{green = c})
         <|> ("blue" $> \c -> mempty{blue = c})
 
-solve :: [(ID, Game)] -> Int
-solve = sum . map fst . filter (all (`isSubsetOf` bag) . snd)
+part1 :: [(ID, Game)] -> Int
+part1 = sum . map fst . filter (all (`isSubsetOf` bag) . snd)
   where
     bag = Cubes{red = 12, green = 13, blue = 14}
+
+part2 :: [(ID, Game)] -> Int
+part2 = sum . map (power . foldMap toMax . snd)
+  where
+    power Cubes{red, green, blue} = getMax red * getMax green * getMax blue
+
+toMax :: Cubes Sum -> Cubes Max
+toMax Cubes{red, green, blue} =
+    Cubes
+        { red = Max $ getSum red
+        , green = Max $ getSum green
+        , blue = Max $ getSum blue
+        }
