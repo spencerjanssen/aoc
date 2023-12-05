@@ -47,7 +47,7 @@ rotations = liftA2 (<>) [mempty, selfInverse $ map reverse] [mempty, selfInverse
 underRotation :: ([[a]] -> [[b]]) -> Rotation -> ([[a]] -> [[b]])
 underRotation f (Rotation r ri) xs = ri $ f $ r xs
 
-gridly :: forall a. Monoid a => ([Int] -> [a]) -> [[Int]] -> Ap ZipList (Ap ZipList a)
+gridly :: forall a. (Monoid a) => ([Int] -> [a]) -> [[Int]] -> Ap ZipList (Ap ZipList a)
 gridly f g = foldMap (\r -> coerce @_ @(Ap ZipList (Ap ZipList a)) $ underRotation (map f) r g) rotations
 
 solve :: (Monoid c, Monoid a) => ([Int] -> [a]) -> (a -> c) -> [[Int]] -> c

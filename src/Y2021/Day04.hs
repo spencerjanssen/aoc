@@ -68,10 +68,10 @@ boardWins ms = mapMaybe (\b -> (b,) <$> playBingo bms b)
     bms = buildMoves ms
 
 -- this is in relude 1.0.0.0
-minimumOn1 :: Ord b => (a -> b) -> [a] -> Maybe a
+minimumOn1 :: (Ord b) => (a -> b) -> [a] -> Maybe a
 minimumOn1 f = listToMaybe . sortOn f
 
-maximumOn1 :: Ord b => (a -> b) -> [a] -> Maybe a
+maximumOn1 :: (Ord b) => (a -> b) -> [a] -> Maybe a
 maximumOn1 f = coerce . listToMaybe . sortOn (Down . f)
 
 -- >>> part1 parsedExample

@@ -116,7 +116,7 @@ simplify = efold C Pure f
     f o (C x) (C y) = C $ operFn o x y
     f o x y = Oper x o y
 
-fixpoint :: Eq a => (a -> a) -> a -> a
+fixpoint :: (Eq a) => (a -> a) -> a -> a
 fixpoint f x
     | x' == f x = x
     | otherwise = fixpoint f x'

@@ -23,7 +23,7 @@ part1 = increases . map (readMaybe @Int . toString) . lines
 part2 :: Text -> Int
 part2 = increases . map sum . windows 3 . mapMaybe (readMaybe @Int . toString) . lines
 
-increases :: Ord a => [a] -> Int
+increases :: (Ord a) => [a] -> Int
 increases xs = sum $ zipWith (\x y -> fromEnum $ y > x) xs (drop 1 xs)
 
 -- >>> windows 3 "ABCDEFGH"

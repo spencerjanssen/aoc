@@ -36,16 +36,16 @@ bitString = map (== '1') . toString
 newtype BitsM a = BitsM {getBitsM :: State [Bool] a}
     deriving newtype (Functor, Applicative, Monad, MonadState [Bool])
 
-evalBitsM :: HasCallStack => BitsM a -> [Bool] -> a
+evalBitsM :: (HasCallStack) => BitsM a -> [Bool] -> a
 evalBitsM = evalState . getBitsM
 
-bail :: HasCallStack => Text -> BitsM a
+bail :: (HasCallStack) => Text -> BitsM a
 bail = error
 
-eof :: HasCallStack => BitsM Bool
+eof :: (HasCallStack) => BitsM Bool
 eof = gets null
 
-region :: HasCallStack => Int -> BitsM a -> BitsM a
+region :: (HasCallStack) => Int -> BitsM a -> BitsM a
 region n pgm = do
     bs <- get
     let (r, bs') = splitAt n bs
@@ -55,7 +55,7 @@ region n pgm = do
             put bs'
             pure $! evalBitsM pgm r
 
-abit :: HasCallStack => BitsM Bool
+abit :: (HasCallStack) => BitsM Bool
 abit = do
     bs <- get
     case bs of
@@ -67,7 +67,7 @@ nbits n = bigEndian <$> replicateM n abit
 
 -- >>> bigEndian $ bitString "011"
 -- 3
-bigEndian :: Bits a => [Bool] -> a
+bigEndian :: (Bits a) => [Bool] -> a
 bigEndian = foldl' (.|.) zeroBits . zipWith (\i b -> if b then bit i else zeroBits) [0 ..] . reverse
 
 data Operation
@@ -99,7 +99,7 @@ header = liftA2 (,) (nbits 3) (nbits 3)
 
 -- >>> evalBitsM packet $ bitString "110100101111111000101000"
 -- Literal 6 2021
-packet :: HasCallStack => BitsM Packet
+packet :: (HasCallStack) => BitsM Packet
 packet = do
     (version, typeId) <- header
     case typeId of
@@ -138,7 +138,7 @@ literal = go 0
         if moreInput then go acc' else pure acc'
 
 -- do we need Integer here?
-lgroup :: HasCallStack => BitsM (Bool, Integer)
+lgroup :: (HasCallStack) => BitsM (Bool, Integer)
 lgroup = liftA2 (,) abit (nbits 4)
 
 -- >>> part1 parsedExample
@@ -160,7 +160,7 @@ part2 bs = pfold (\_ n -> fromIntegral n) op $ evalBitsM packet bs
     op _ OMinimum xs = monoidally Min getMin xs
     op _ _ _ = error "unknown operator or invalid args"
 
-monoidally :: Monoid (f a) => (a -> f a) -> (f a -> a) -> [a] -> a
+monoidally :: (Monoid (f a)) => (a -> f a) -> (f a -> a) -> [a] -> a
 monoidally to out = out . foldMap to
 
 unit_literal_packet :: Assertion

@@ -55,10 +55,10 @@ risksToGraph rs = fromAdjacencyList [(ij, [(ij', w) | ij' <- neighbors ij, w <- 
 
 type Graph v w = Map v [(v, w)]
 
-fromAdjacencyList :: Ord v => [(v, [(v, w)])] -> Graph v w
+fromAdjacencyList :: (Ord v) => [(v, [(v, w)])] -> Graph v w
 fromAdjacencyList = fromList
 
-adjacent :: Ord v => v -> Graph v w -> [(v, w)]
+adjacent :: (Ord v) => v -> Graph v w -> [(v, w)]
 adjacent x g = maybe [] toList $ lookup x g
 
 shortestPath :: (Monoid wg, Ord v, Ord wg, Hashable v) => v -> v -> Graph v wg -> Maybe wg

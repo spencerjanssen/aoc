@@ -35,13 +35,13 @@ data Cubes f = Cubes
     , blue :: f Int
     }
 
-instance Semigroup (f Int) => Semigroup (Cubes f) where
+instance (Semigroup (f Int)) => Semigroup (Cubes f) where
     Cubes r1 g1 b1 <> Cubes r2 g2 b2 = Cubes (r1 <> r2) (g1 <> g2) (b1 <> b2)
 
-instance Monoid (f Int) => Monoid (Cubes f) where
+instance (Monoid (f Int)) => Monoid (Cubes f) where
     mempty = Cubes mempty mempty mempty
 
-isSubsetOf :: Ord (f Int) => Cubes f -> Cubes f -> Bool
+isSubsetOf :: (Ord (f Int)) => Cubes f -> Cubes f -> Bool
 isSubsetOf (Cubes r1 g1 b1) (Cubes r2 g2 b2) = r1 <= r2 && g1 <= g2 && b1 <= b2
 
 games :: Parsec Void Text [(ID, Game)]
