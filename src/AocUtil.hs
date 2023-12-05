@@ -35,8 +35,8 @@ puzzleInput Puzzle{year, day, parser} i = parseThrowIO parser filePath . decodeU
     filePath = "inputs" </> T.unpack year </> "day" <> T.unpack day </> map toLower (show i) <.> "txt"
 
 tests :: Puzzle a -> TestTree
-tests p@Puzzle{parts, day} = withResource getInputs cleanup $ \gi ->
-    testGroup ("Day " <> toString day) (testParser gi : zipWith (testPart gi) [1 :: Int ..] parts)
+tests p@Puzzle{parts, year, day} = withResource getInputs cleanup $ \gi ->
+    testGroup ("Year " <> toString year <> " day " <> toString day) (testParser gi : zipWith (testPart gi) [1 :: Int ..] parts)
   where
     testParser gi = testGroup "Parser" [testCase "Succeeds" $ void gi]
     getInputs = liftA2 (,) (puzzleInput p Example) (puzzleInput p Problem)
