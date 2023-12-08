@@ -34,11 +34,13 @@ common options
     BangPatterns
     BlockArguments
     DerivingVia
+    FlexibleContexts
     GeneralizedNewtypeDeriving
     ImportQualifiedPost
     LambdaCase
     NamedFieldPuns
     NumericUnderscores
+    OverloadedRecordDot
     OverloadedStrings
     RecordWildCards
     TemplateHaskell

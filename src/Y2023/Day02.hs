@@ -36,13 +36,18 @@ data Cubes f = Cubes
     }
 
 instance (Semigroup (f Int)) => Semigroup (Cubes f) where
-    Cubes r1 g1 b1 <> Cubes r2 g2 b2 = Cubes (r1 <> r2) (g1 <> g2) (b1 <> b2)
+    x <> y =
+        Cubes
+            { red = x.red <> y.red
+            , blue = x.blue <> y.blue
+            , green = x.green <> y.green
+            }
 
 instance (Monoid (f Int)) => Monoid (Cubes f) where
     mempty = Cubes mempty mempty mempty
 
 isSubsetOf :: (Ord (f Int)) => Cubes f -> Cubes f -> Bool
-isSubsetOf (Cubes r1 g1 b1) (Cubes r2 g2 b2) = r1 <= r2 && g1 <= g2 && b1 <= b2
+isSubsetOf x y = x.red <= y.red && x.green <= y.green && x.blue <= y.blue
 
 games :: Parsec Void Text [(ID, Game)]
 games = endBy game eol <* eof
@@ -79,12 +84,12 @@ part1 = sum . map fst . filter (all (`isSubsetOf` bag) . snd)
 part2 :: [(ID, Game)] -> Int
 part2 = sum . map (power . foldMap toMax . snd)
   where
-    power Cubes{red, green, blue} = getMax red * getMax green * getMax blue
+    power c = c.red.getMax * c.green.getMax * c.blue.getMax
 
 toMax :: Cubes Sum -> Cubes Max
-toMax Cubes{red, green, blue} =
+toMax c =
     Cubes
-        { red = Max $ getSum red
-        , green = Max $ getSum green
-        , blue = Max $ getSum blue
+        { red = Max c.red.getSum
+        , green = Max c.green.getSum
+        , blue = Max c.blue.getSum
         }
