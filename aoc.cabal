@@ -85,6 +85,7 @@ library
     Y2023.Day01
     Y2023.Day02
     Y2023.Day03
+    Y2023.Day04
 
 test-suite test
   import:         deps, options
@@ -124,3 +125,4 @@ test-suite test
     Y2023.Day01
     Y2023.Day02
     Y2023.Day03
+    Y2023.Day04
