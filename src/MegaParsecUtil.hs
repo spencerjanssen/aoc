@@ -9,6 +9,7 @@ module MegaParsecUtil (
     alphaNum,
     alphaNumDot,
     asciiAlpha,
+    nonNumericChar,
 ) where
 
 import Data.Char
@@ -44,3 +45,6 @@ alphaNum = takeWhile1P (Just "ascii alpha num") isAlphaNum
 
 alphaNumDot :: Parsec Void Text Text
 alphaNumDot = takeWhile1P (Just "ascii alpha num or .") (liftA2 (||) isAlphaNum ('.' ==))
+
+nonNumericChar :: Parsec Void Text Char
+nonNumericChar = satisfy (\c -> not $ any ($ c) [isDigit, isControl, isSpace]) <?> "non-numeric char"
