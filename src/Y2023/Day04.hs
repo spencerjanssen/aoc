@@ -2,6 +2,7 @@ module Y2023.Day04 where
 
 import AocUtil
 import Data.IntSet qualified as Set
+import Data.Map.Lazy qualified as Map
 import MegaParsecUtil
 import Test.Tasty
 import Text.Megaparsec
@@ -16,6 +17,7 @@ puzzle =
         , parser = cards
         , parts =
             [ Part part1 13 20829
+            , Part part2 30 12648035
             ]
         }
 
@@ -47,12 +49,17 @@ card = do
     sp = char ' '
 
 part1 :: [Card] -> Int
-part1 cs =
-    sum
-        [ score winners
-        | c <- cs
-        , let winners = Set.size $ Set.intersection (Set.fromList c.winning) (Set.fromList c.have)
-        ]
+part1 = sum . map (score . winners)
   where
     score 0 = 0
     score n = 2 ^ pred n
+
+winners :: Card -> Int
+winners c = Set.size $ Set.intersection (Set.fromList c.winning) (Set.fromList c.have)
+
+part2 :: [Card] -> Int
+part2 cs = sum $ Map.elems m
+  where
+    f c = 1 + sum (map f' [succ c.cardNo .. c.cardNo + winners c])
+    m = Map.fromList $ map (\c -> (c.cardNo, f c)) cs
+    f' = fromMaybe 0 . flip Map.lookup m
