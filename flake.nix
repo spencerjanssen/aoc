@@ -7,7 +7,7 @@
   };
 
   outputs = { self, nixpkgs, flake-utils, nix-filter, ... }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         project = returnShellEnv:
